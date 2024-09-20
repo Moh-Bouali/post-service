@@ -40,5 +40,6 @@ jobs:
     - name: Push Docker image
       run: docker push moh96/post-service:${{ github.sha }}
 
-    # - name: Deploy to Kubernetes
-    #   run: kubectl apply -f kubernetes-deployment.yaml
+    - name: Deploy to Kubernetes
+      run: kubectl apply -f kubernetes-deployment.yaml
+      working-directory: ./post-service
