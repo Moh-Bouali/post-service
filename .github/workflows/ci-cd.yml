@@ -1,0 +1,44 @@
+name: CI/CD Pipeline with SonarCloud
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Build with Maven
+      run: mvn clean install
+      working-directory: ./user-service
+
+    - name: SonarCloud Scan
+      run: mvn sonar:sonar -Dsonar.projectKey=Moh-Bouali_user-service -Dsonar.organization=moh-bouali -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      working-directory: ./user-service
+
+    - name: Build Docker image
+      run: docker build -t moh96/user-service:${{ github.sha }} .
+      working-directory: ./user-service
+      
+    - name: Log in to DockerHub
+      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+    - name: Push Docker image
+      run: docker push moh96/user-service:${{ github.sha }}
+
+    - name: Deploy to Kubernetes
+      run: kubectl apply -f kubernetes-deployment.yaml
