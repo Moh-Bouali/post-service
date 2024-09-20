@@ -28,7 +28,7 @@ jobs:
 
     - name: SonarCloud Scan
       run: mvn sonar:sonar -Dsonar.projectKey=Moh-Bouali_post-service -Dsonar.organization=moh-bouali -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-      working-directory: ./user-service
+      working-directory: ./post-service
 
     - name: Build Docker image
       run: docker build -t moh96/post-service:${{ github.sha }} .
