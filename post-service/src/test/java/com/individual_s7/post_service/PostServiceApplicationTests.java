@@ -11,5 +11,4 @@ class PostServiceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
