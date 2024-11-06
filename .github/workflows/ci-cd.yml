@@ -40,15 +40,18 @@ jobs:
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
       working-directory: ./post-service
 
-    - name: Build Docker image
-      run: docker build -t moh96/post-service:${{ github.sha }} .
+    - name: Build Docker Image
+      run: docker build -t moh96/post-service:latest -t moh96/post-service:${{ github.sha }} .
       working-directory: ./post-service
       
     - name: Log in to DockerHub
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    - name: Push Docker image
+    - name: Push Docker Image with SHA Tag
       run: docker push moh96/post-service:${{ github.sha }}
+
+    - name: Push Docker Image with Latest Tag
+      run: docker push moh96/post-service:latest
 
     # - name: Deploy to Kubernetes
     #   run: kubectl apply -f kubernetes-deployment.yaml
