@@ -43,9 +43,19 @@ jobs:
     - name: Build Docker Image
       run: docker build -t moh96/post-service:latest -t moh96/post-service:${{ github.sha }} .
       working-directory: ./post-service
+
+    - name: Install Trivy
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install wget -y
+        wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_amd64.deb
+        sudo dpkg -i trivy_amd64.deb
       
     - name: Log in to DockerHub
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+    - name: Scan Docker Image
+      run: trivy image --exit-code 1 --severity HIGH,CRITICAL moh96/post-service:latest
 
     - name: Push Docker Image with SHA Tag
       run: docker push moh96/post-service:${{ github.sha }}
