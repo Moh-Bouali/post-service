@@ -54,6 +54,14 @@ jobs:
     - name: Log in to DockerHub
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+    - name: Cache Trivy Vulnerability Database
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/trivy
+        key: ${{ runner.os }}-trivy-db
+        restore-keys: |
+          ${{ runner.os }}-trivy-db
+
     - name: Scan Docker Image
       run: trivy image --exit-code 1 --severity HIGH,CRITICAL moh96/post-service:latest
 
