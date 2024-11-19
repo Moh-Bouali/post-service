@@ -48,8 +48,8 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install wget -y
-        wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_amd64.deb
-        sudo dpkg -i trivy_amd64.deb
+        wget https://github.com/aquasecurity/trivy/releases/download/v0.43.0/trivy_0.43.0_Linux-64bit.deb
+        sudo dpkg -i trivy_0.43.0_Linux-64bit.deb
       
     - name: Log in to DockerHub
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
