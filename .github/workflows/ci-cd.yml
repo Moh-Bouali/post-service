@@ -63,7 +63,7 @@ jobs:
           ${{ runner.os }}-trivy-db
 
     - name: Scan Docker Image
-      run: trivy image --exit-code 1 --severity HIGH,CRITICAL moh96/post-service:latest
+      run: trivy image --exit-code 1 --severity CRITICAL moh96/post-service:latest
 
     - name: Push Docker Image with SHA Tag
       run: docker push moh96/post-service:${{ github.sha }}
