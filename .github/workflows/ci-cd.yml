@@ -62,8 +62,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-trivy-java-db
 
+    # - name: Scan Docker Image
+    #   run: trivy image --exit-code 1 --severity CRITICAL moh96/post-service:latest
+
     - name: Scan Docker Image
-      run: trivy image --exit-code 1 --severity CRITICAL moh96/post-service:latest
+      run: |
+        for i in {1..3}; do
+          trivy image --exit-code 1 --severity CRITICAL moh96/post-service:latest && break || sleep 60;
+        done
 
     - name: Push Docker Image with SHA Tag
       run: docker push moh96/post-service:${{ github.sha }}
