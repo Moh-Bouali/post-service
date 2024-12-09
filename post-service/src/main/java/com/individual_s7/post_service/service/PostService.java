@@ -35,6 +35,9 @@ public class PostService {
     public void createOrUpdateUserPosts(PostRequest postRequest) {
 
         for (PostContent post : postRequest.content()) {
+            if (post == null || post.getContent() == null || post.getContent().isEmpty()) {
+                throw new IllegalArgumentException("Post content is required for moderation!");
+            }
             if (!isContentAllowed(post.getContent())) {
                 throw new IllegalArgumentException("Post content contains prohibited words!");
             }
@@ -63,6 +66,7 @@ public class PostService {
         try {
             // Send content to Azure Function
             ContentModerationRequest request = new ContentModerationRequest(content);
+            System.out.println("Sending content to Azure Function for moderation" + content);
             ResponseEntity<ContentModerationResponse> response = restTemplate.postForEntity(
                     contentModerationUrl,
                     request,
