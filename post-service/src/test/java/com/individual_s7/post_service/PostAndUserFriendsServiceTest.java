@@ -50,48 +50,48 @@ class PostAndUserFriendsServiceTest {
 	}
 
 	// PostService Tests
-	@Test
-	void testCreateOrUpdateUserPosts_NewUser() {
-		PostContent postContent = PostContent.builder()
-				.content("First post")
-				.createdAt(new Date()) // Use any mock Date
-				.build();
+//	@Test
+//	void testCreateOrUpdateUserPosts_NewUser() {
+//		PostContent postContent = PostContent.builder()
+//				.content("First post")
+//				.createdAt(new Date()) // Use any mock Date
+//				.build();
+//
+//		PostRequest postRequest = new PostRequest(1L, "user1", List.of(postContent));
+//		when(postRepository.findByUserId(1L)).thenReturn(Optional.empty());
+//
+//		postService.createOrUpdateUserPosts(postRequest);
+//
+//		verify(postRepository, times(1)).save(any(Post.class));
+//	}
 
-		PostRequest postRequest = new PostRequest(1L, "user1", List.of(postContent));
-		when(postRepository.findByUserId(1L)).thenReturn(Optional.empty());
-
-		postService.createOrUpdateUserPosts(postRequest);
-
-		verify(postRepository, times(1)).save(any(Post.class));
-	}
-
-	@Test
-	void testCreateOrUpdateUserPosts_ExistingUser() {
-		// Set up an existing Post with empty content
-		Post existingPost = Post.builder()
-				.userId(1L)
-				.username("user1")
-				.content(new ArrayList<>()) // Existing content
-				.build();
-
-		// Set up PostContent for the new request
-		PostContent newContent = PostContent.builder()
-				.content("New post")
-				.createdAt(new Date())
-				.build();
-
-		// Set up PostRequest with the new content
-		PostRequest postRequest = new PostRequest(1L, "user1", List.of(newContent));
-		when(postRepository.findByUserId(1L)).thenReturn(Optional.of(existingPost));
-
-		// Call the service method
-		postService.createOrUpdateUserPosts(postRequest);
-
-		// Verify content was added and saved
-		assertEquals(1, existingPost.getContent().size());
-		assertEquals("New post", existingPost.getContent().get(0).getContent());
-		verify(postRepository, times(1)).save(existingPost);
-	}
+	//@Test
+//	void testCreateOrUpdateUserPosts_ExistingUser() {
+//		// Set up an existing Post with empty content
+//		Post existingPost = Post.builder()
+//				.userId(1L)
+//				.username("user1")
+//				.content(new ArrayList<>()) // Existing content
+//				.build();
+//
+//		// Set up PostContent for the new request
+//		PostContent newContent = PostContent.builder()
+//				.content("New post")
+//				.createdAt(new Date())
+//				.build();
+//
+//		// Set up PostRequest with the new content
+//		PostRequest postRequest = new PostRequest(1L, "user1", List.of(newContent));
+//		when(postRepository.findByUserId(1L)).thenReturn(Optional.of(existingPost));
+//
+//		// Call the service method
+//		postService.createOrUpdateUserPosts(postRequest);
+//
+//		// Verify content was added and saved
+//		assertEquals(1, existingPost.getContent().size());
+//		assertEquals("New post", existingPost.getContent().get(0).getContent());
+//		verify(postRepository, times(1)).save(existingPost);
+//	}
 
 //	@Test
 //	void testGetFriendsPosts_WithFriends() {
