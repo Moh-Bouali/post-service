@@ -32,27 +32,24 @@ public class PostService {
     @Value("${azure.function.url}")
     private String contentModerationUrl;
 
-    public void createOrUpdateUserPosts(PostRequest postRequest) {
-
+    public boolean createOrUpdateUserPosts(PostRequest postRequest) {
         for (PostContent post : postRequest.content()) {
             if (post == null || post.getContent() == null || post.getContent().isEmpty()) {
-                throw new IllegalArgumentException("Post content is required for moderation!");
+                return false; // Missing content
             }
             if (!isContentAllowed(post.getContent())) {
-                throw new IllegalArgumentException("Post content contains prohibited words!");
+                return false; // Content not allowed
             }
         }
 
-        // Find the user's existing posts by userId
+        // Continue with normal save logic if allowed
         Optional<Post> existingPost = postRepository.findByUserId(postRequest.userId());
 
         if (existingPost.isPresent()) {
-            // User exists, append the new post to the existing list of posts
             Post userPost = existingPost.get();
-            userPost.getContent().addAll(postRequest.content()); // Add new posts to the existing list
-            postRepository.save(userPost); // Save the updated post list
+            userPost.getContent().addAll(postRequest.content());
+            postRepository.save(userPost);
         } else {
-            // User doesn't exist, create a new document
             Post newPost = Post.builder()
                     .userId(postRequest.userId())
                     .username(postRequest.username())
@@ -60,13 +57,45 @@ public class PostService {
                     .build();
             postRepository.save(newPost);
         }
+
+        return true;
     }
+
+
+//    public void createOrUpdateUserPosts(PostRequest postRequest) {
+//        for (PostContent post : postRequest.content()) {
+//            if (post == null || post.getContent() == null || post.getContent().isEmpty()) {
+//                throw new IllegalArgumentException("Post content is required for moderation!");
+//            }
+//            if (!isContentAllowed(post.getContent())) {
+//                throw new IllegalArgumentException("Post content contains prohibited words!");
+//            }
+//        }
+//
+//        // Find the user's existing posts by userId
+//        Optional<Post> existingPost = postRepository.findByUserId(postRequest.userId());
+//
+//        if (existingPost.isPresent()) {
+//            // User exists, append the new post to the existing list of posts
+//            Post userPost = existingPost.get();
+//            userPost.getContent().addAll(postRequest.content()); // Add new posts to the existing list
+//            postRepository.save(userPost); // Save the updated post list
+//        } else {
+//            // User doesn't exist, create a new document
+//            Post newPost = Post.builder()
+//                    .userId(postRequest.userId())
+//                    .username(postRequest.username())
+//                    .content(postRequest.content())
+//                    .build();
+//            postRepository.save(newPost);
+//        }
+//    }
 
     private boolean isContentAllowed(String content) {
         try {
             // Send content to Azure Function
             ContentModerationRequest request = new ContentModerationRequest(content);
-            System.out.println("Sending content to Azure Function for moderation" + content);
+            System.out.println("Sending content to Azure Function for moderation " + content);
             ResponseEntity<ContentModerationResponse> response = restTemplate.postForEntity(
                     contentModerationUrl,
                     request,
