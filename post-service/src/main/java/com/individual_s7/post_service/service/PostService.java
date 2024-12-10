@@ -95,7 +95,6 @@ public class PostService {
         try {
             // Send content to Azure Function
             ContentModerationRequest request = new ContentModerationRequest(content);
-            System.out.println("Sending content to Azure Function for moderation " + content);
             ResponseEntity<ContentModerationResponse> response = restTemplate.postForEntity(
                     contentModerationUrl,
                     request,
@@ -106,7 +105,7 @@ public class PostService {
             return response.getStatusCode().is2xxSuccessful() &&
                     "approved".equals(response.getBody().getStatus());
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to moderate content", e);
+            return false;
         }
     }
 
