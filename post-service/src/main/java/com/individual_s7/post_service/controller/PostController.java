@@ -26,7 +26,7 @@ public class PostController {
     @PostMapping("/create")
     public ResponseEntity<String> createPost(@RequestBody PostRequest postRequest) {
         if(!postService.createOrUpdateUserPosts(postRequest)) {
-            return ResponseEntity.ok("Post contains inappropriate content!");
+            return ResponseEntity.badRequest().body("Post contains inappropriate content!");
         }
         return ResponseEntity.ok("Post created!");
 //        postService.createOrUpdateUserPosts(postRequest);
