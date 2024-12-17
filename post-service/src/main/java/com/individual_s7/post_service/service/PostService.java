@@ -10,6 +10,7 @@ import com.individual_s7.post_service.model.Post;
 import com.individual_s7.post_service.model.PostContent;
 import com.individual_s7.post_service.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -120,9 +121,21 @@ public class PostService {
     }
 
     //delete posts by user id that were listened from rabbitmq delete user
+//    @RabbitListener(queues = RabbitMQConfig.USER_DELETE_QUEUE)
+//    public void deleteUserPosts(Long userId) {
+//        postRepository.deleteAllByUserId(userId);
+//    }
+
     @RabbitListener(queues = RabbitMQConfig.USER_DELETE_QUEUE)
     public void deleteUserPosts(Long userId) {
-        postRepository.deleteAllByUserId(userId);
+        try {
+            // Best practice is to check if user exists before deleting, to-do for later versions.
+            postRepository.deleteAllByUserId(userId);
+            System.out.println("Deleted posts for userId: " + userId);
+        } catch (Exception e) {
+            System.err.println("Error deleting posts for userId: " + userId);
+            throw new AmqpRejectAndDontRequeueException(e); // Sends to DLQ
+        }
     }
 
     @RabbitListener(queues = RabbitMQConfig.USER_UPDATE_QUEUE)
